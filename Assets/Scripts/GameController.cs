@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-    public GameObject hazard;
+    public GameObject[] hazards;
     public Vector3 spawnValues;
     public int hazardCount;
     public float spawnWait;
@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     public Text ScoreText;
     public Text gameOverText;
     public Text restartText;
+    public Text winText;
 
     private bool gameOver;
     private bool restart;
@@ -26,6 +27,7 @@ public class GameController : MonoBehaviour
         restart = false;
         restartText.text = "";
         gameOverText.text = "";
+        winText.text = "";
         score = 0;
         UpdateScore();
         StartCoroutine(SpawnWaves());
@@ -34,11 +36,15 @@ public class GameController : MonoBehaviour
 
          void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.R))
+        if (restart)
         {
-            SceneManager.LoadScene("Space Shooter");
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                SceneManager.LoadScene("Space Shooter");
+            }
+
         }
+     
 
         if (Input.GetKey("escape"))
         {
@@ -54,6 +60,7 @@ public class GameController : MonoBehaviour
         {
             for (int i = 0; i < hazardCount; i++)
             {
+                GameObject hazard = hazards[Random.Range (0,hazards.Length)];
                 Vector3 spawnPosition = new Vector3(Random.Range(-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
                 Quaternion spawnRotation = Quaternion.identity;
                 Instantiate(hazard, spawnPosition, spawnRotation);
@@ -63,7 +70,6 @@ public class GameController : MonoBehaviour
 
             if (gameOver)
             {
-                restartText.text = "Press 'R' for Restart";
                 restart = true;
                 break;
             }
@@ -78,11 +84,19 @@ public class GameController : MonoBehaviour
 
     void UpdateScore()
     {
-        ScoreText.text = "Score: " + score;
+        ScoreText.text = "Point: " + score;
+        if(score >=100)
+        {
+            winText.text = "Created by:Sebastian Rivera";
+            gameOver = true;
+            restart = true;
+        }
     }
 
     public void GameOver ()
     {
+        restartText.text = "Press 'T' for Restart";
+        restart = true;
         gameOverText.text = "Game Over!";
         gameOver = true;
     }
