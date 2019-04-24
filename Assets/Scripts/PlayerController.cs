@@ -12,15 +12,18 @@ public class PlayerController : MonoBehaviour
     public float speed;
     public float tilt;
     public Boundary boundary;
+    public float powerUp; 
+    public bool rate;
 
     public GameObject shot;
     public Transform shotSpawn;
     public float fireRate;
-
+   
     private float nextFire;
 
     private Rigidbody rb;
     private AudioSource Audio;
+    
 
     private void Start()
     {
@@ -29,14 +32,48 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        PickUp();
+
       if (Input.GetButton("Fire1") && Time.time > nextFire)
         {
             nextFire = Time.time + fireRate;
-            GameObject clone = Instantiate(shot, shotSpawn.position, shotSpawn.rotation); //as GameObject;
+            GameObject clone = Instantiate(shot, shotSpawn.position, shotSpawn.rotation); 
             Audio.Play();
-
         }
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("PowerUp"))
+        {
+            rate = true;
+            powerUp = 5;
+            Destroy(other.gameObject);
+        }
+    }
+
+    void PickUp()
+    {
+
+        if (rate == true)
+        {
+            powerUp -= Time.deltaTime;
+            fireRate = 0.10f;
+
+        }
+        else if (rate == false)
+        {
+            fireRate = .45f;
+        }
+
+        if (powerUp <=0)
+        {
+            rate = false;
+        }
+
+    }
+
+
     void FixedUpdate()
     {
         float moveHorizontal = Input.GetAxis("Horizontal");
